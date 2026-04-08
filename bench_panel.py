@@ -57,7 +57,6 @@ HTML_TEMPLATE = """
       --surface: rgba(255,255,255,.96);
       --surface-solid: #ffffff;
       --input-bg: #ffffff;
-      --log-bg: #f8fafc;
       --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
       --radius-xl: 22px;
       --radius-lg: 18px;
@@ -81,27 +80,7 @@ HTML_TEMPLATE = """
       --surface: rgba(255,255,255,.94);
       --surface-solid: #ffffff;
       --input-bg: #ffffff;
-      --log-bg: #f8fafc;
       --shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
-    }
-    body[data-theme="dark"] {
-      --bg-start: #020617;
-      --bg-end: #0f172a;
-      --bg: #0f172a;
-      --panel: #111827;
-      --muted: #94a3b8;
-      --text: #e5e7eb;
-      --green: #10b981;
-      --red: #ef4444;
-      --amber: #f59e0b;
-      --blue: #3b82f6;
-      --border: #243041;
-      --card: #111827;
-      --surface: rgba(15, 23, 42, 0.92);
-      --surface-solid: #111827;
-      --input-bg: #0b1220;
-      --log-bg: #020617;
-      --shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
     }
 
     * { box-sizing: border-box; }
@@ -275,6 +254,72 @@ HTML_TEMPLATE = """
       margin: 0;
       font-size: 20px;
       line-height: 1.2;
+    }
+
+    .panel-terminal {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .terminal-shell {
+      background: #0a0f1b;
+      color: #d8e1f2;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      height: clamp(320px, 55vh, 620px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .terminal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(148,163,184,0.25);
+      background: linear-gradient(180deg, #121a2a 0%, #0c1423 100%);
+    }
+
+    .terminal-title {
+      font-size: 12px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #9fb5d9;
+    }
+
+    .terminal-path {
+      font-size: 12px;
+      color: #7dd3fc;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 68vw;
+    }
+
+    .terminal-path.hidden {
+      display: none;
+    }
+
+    .terminal-output {
+      margin: 0;
+      padding: 14px;
+      font-size: 12px;
+      line-height: 1.45;
+      overflow: auto;
+      flex: 1;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(59,130,246,.10), transparent 36%),
+        radial-gradient(circle at 100% 0%, rgba(16,185,129,.08), transparent 35%),
+        #0a0f1b;
+    }
+
+    @media (max-width: 860px) {
+      .terminal-shell {
+        height: clamp(280px, 50vh, 520px);
+      }
     }
 
     .panel-head {
@@ -582,61 +627,6 @@ HTML_TEMPLATE = """
     .muted { color: var(--muted); }
     .small { font-size: 12px; }
     .mono { font-family: "JetBrains Mono", Consolas, monospace; }
-
-    .logbox {
-      background: var(--log-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px;
-      height: 360px;
-      overflow: auto;
-      white-space: pre-wrap;
-      font-family: "JetBrains Mono", Consolas, monospace;
-      font-size: 12.5px;
-      line-height: 1.55;
-    }
-    .live-log-table-wrap {
-      margin-bottom: 10px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      background: var(--surface-solid);
-    }
-    .live-log-table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
-    }
-    .live-log-table th, .live-log-table td {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border);
-      font-size: 13px;
-      vertical-align: middle;
-    }
-    .live-log-table th {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      color: var(--muted);
-      font-weight: 800;
-    }
-    .live-log-table tr:last-child td {
-      border-bottom: none;
-    }
-    .live-log-head {
-      margin-top: 8px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .live-log-title {
-      font-size: 13px;
-      color: var(--muted);
-      font-weight: 700;
-    }
 
     .sites-tools {
       margin: 12px 0;
@@ -1076,38 +1066,18 @@ HTML_TEMPLATE = """
           </table>
         </div>
       </div>
-    </div>
 
-    <div class="panel">
-      <div class="panel-head">
-        <div>
-          <h3>Logs</h3>
-          <div class="panel-sub">Recent bench and site process output.</div>
+      <div class="panel panel-terminal" style="margin-top:16px;">
+        <div class="terminal-shell">
+          <div class="terminal-head">
+            <div class="terminal-title">Live Terminal</div>
+            <div id="terminalPath" class="terminal-path hidden"></div>
+          </div>
+          <pre id="terminalOutput" class="terminal-output">$ waiting for terminal logs...</pre>
         </div>
       </div>
-      <div class="live-log-table-wrap">
-        <table class="live-log-table">
-          <thead>
-            <tr>
-              <th>Site</th>
-              <th>Source</th>
-              <th>Port</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="liveSiteLogTableBody">
-            <tr><td colspan="4" class="muted">No live site servers.</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="live-log-head">
-        <div id="selectedLiveLogTitle" class="live-log-title">Selected Site Log: none</div>
-        <button class="btn btn-gray" onclick="refreshSelectedLiveSiteLog()">Refresh Live Site Log</button>
-      </div>
-      <div id="siteLiveLogBox" class="logbox">Select a running site from the table above to view live site log.</div>
-      <div style="height:10px"></div>
-      <div id="logBox" class="logbox">Loading logs...</div>
     </div>
+
   </div>
 
   <div id="runSiteModal" class="modal" onclick="handleModalBackdropClick(event)">
@@ -1146,7 +1116,7 @@ HTML_TEMPLATE = """
     <div class="modal-card">
       <h4 class="modal-title">Force Stop (sudo)</h4>
       <div class="modal-row muted small">
-        This runs: <span class="mono">sudo pkill -f &quot;frappe&quot; &amp;&amp; sudo pkill redis-server</span>
+        This runs: <span class="mono">sudo pkill -f &quot;bench serve&quot; ; sudo pkill -f &quot;frappe.utils.bench_helper&quot; ; sudo pkill redis-server</span>
       </div>
       <div class="modal-row">
         <label class="muted small" for="forceStopSudoPassword">Sudo Password</label>
@@ -1201,13 +1171,10 @@ HTML_TEMPLATE = """
     let siteRowsCache = [];
     let sitePage = 1;
     let siteSearch = '';
-    let liveSiteEntries = [];
-    let selectedLiveLogSite = '';
-    let selectedLiveLogPort = null;
-    let selectedLiveLogRemote = false;
     const SITE_PAGE_SIZE = 6;
     const SSH_STATE_KEY = 'bench_panel_ssh_state_v1';
     const THEME_STATE_KEY = 'bench_panel_theme_v1';
+    let terminalAutoStick = true;
 
     function applyTheme(theme) {
       const selected = theme === 'light' ? 'light' : 'dark';
@@ -1230,12 +1197,7 @@ HTML_TEMPLATE = """
     window.toggleTheme = toggleTheme;
 
     function restoreTheme() {
-      try {
-        const saved = localStorage.getItem(THEME_STATE_KEY) || 'light';
-        applyTheme(saved === 'dark' ? 'dark' : 'light');
-      } catch (e) {
-        applyTheme('light');
-      }
+      applyTheme('light');
     }
 
     function statusBadge(label, cls, extra='') {
@@ -1253,6 +1215,52 @@ HTML_TEMPLATE = """
         .replaceAll('>', '&gt;')
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#39;');
+    }
+
+    function setupTerminalAutoStick() {
+      const output = document.getElementById('terminalOutput');
+      if (!output) return;
+      output.addEventListener('scroll', () => {
+        const gap = output.scrollHeight - output.scrollTop - output.clientHeight;
+        terminalAutoStick = gap < 40;
+      });
+    }
+
+    function renderTerminalSnapshot(data) {
+      const output = document.getElementById('terminalOutput');
+      const pathNode = document.getElementById('terminalPath');
+      if (!output || !pathNode) return;
+
+      const shouldStick = terminalAutoStick || (output.scrollHeight - output.scrollTop - output.clientHeight) < 40;
+      output.textContent = String(data.output || '$ waiting for terminal logs...');
+
+      const path = String(data.path || '').trim();
+      if (path) {
+        pathNode.textContent = `Path: ${path}`;
+        pathNode.classList.remove('hidden');
+      } else {
+        pathNode.textContent = '';
+        pathNode.classList.add('hidden');
+      }
+
+      if (shouldStick) {
+        output.scrollTop = output.scrollHeight;
+      }
+    }
+
+    async function refreshTerminal() {
+      try {
+        const data = sshRemoteSession
+          ? await api('/api/ssh/terminal', 'POST', sshRemoteSession)
+          : await api('/api/terminal');
+        renderTerminalSnapshot(data);
+      } catch (e) {
+        renderTerminalSnapshot({
+          running: false,
+          path: '',
+          output: `$ terminal update failed: ${e.message || 'unknown error'}`,
+        });
+      }
     }
 
     function onSiteSearchInput() {
@@ -1295,73 +1303,6 @@ HTML_TEMPLATE = """
         label.textContent = `Page ${sitePage} / ${totalPages}`;
       }
     }
-
-    function renderLiveSiteLogTable(entries) {
-      const body = document.getElementById('liveSiteLogTableBody');
-      if (!body) return;
-      const rows = entries || [];
-      if (!rows.length) {
-        body.innerHTML = '<tr><td colspan="4" class="muted">No live site servers.</td></tr>';
-        return;
-      }
-      body.innerHTML = rows.map((r) => {
-        const siteArg = encodeURIComponent(r.site || '');
-        const portArg = Number.isInteger(Number(r.port)) ? Number(r.port) : null;
-        const remoteArg = r.remote ? 'true' : 'false';
-        return `<tr>
-          <td><strong>${escapeHtml(r.site || '')}</strong></td>
-          <td>${escapeHtml(r.source || '-')}</td>
-          <td>${r.port ? String(r.port) : '-'}</td>
-          <td><button class="btn btn-blue" onclick="openLiveSiteLog(decodeURIComponent('${siteArg}'), ${portArg === null ? 'null' : portArg}, ${remoteArg})">View Log</button></td>
-        </tr>`;
-      }).join('');
-    }
-
-    async function openLiveSiteLog(site, port=null, remote=false) {
-      selectedLiveLogSite = String(site || '').trim();
-      selectedLiveLogPort = port === null ? null : Number(port);
-      selectedLiveLogRemote = Boolean(remote);
-      const title = document.getElementById('selectedLiveLogTitle');
-      if (title) {
-        const src = selectedLiveLogRemote ? 'SSH' : 'Local';
-        const portLabel = selectedLiveLogPort ? `:${selectedLiveLogPort}` : '';
-        title.textContent = `Selected Site Log: ${selectedLiveLogSite} (${src}${portLabel})`;
-      }
-      await refreshSelectedLiveSiteLog(false);
-    }
-    window.openLiveSiteLog = openLiveSiteLog;
-
-    async function refreshSelectedLiveSiteLog(silent=true) {
-      const box = document.getElementById('siteLiveLogBox');
-      if (!box) return;
-      if (!selectedLiveLogSite) {
-        box.textContent = 'Select a running site from the table above to view live site log.';
-        return;
-      }
-      try {
-        let data;
-        if (selectedLiveLogRemote) {
-          if (!sshRemoteSession) {
-            box.textContent = 'SSH session not connected.';
-            return;
-          }
-          data = await api('/api/ssh/site/live-log', 'POST', {
-            ...sshRemoteSession,
-            site: selectedLiveLogSite,
-            port: selectedLiveLogPort,
-            lines: 180,
-          });
-        } else {
-          data = await api(`/api/site/live-log?site=${encodeURIComponent(selectedLiveLogSite)}&lines=180`);
-        }
-        box.textContent = (data.logs || []).join('\n') || 'No log lines yet.';
-        box.scrollTop = box.scrollHeight;
-      } catch (e) {
-        box.textContent = `Could not load live site log: ${e.message || 'unknown error'}`;
-        if (!silent) showToast(e.message || 'Live log failed', 'error');
-      }
-    }
-    window.refreshSelectedLiveSiteLog = refreshSelectedLiveSiteLog;
 
     function showToast(message, type='info') {
       const wrap = document.getElementById('toastWrap');
@@ -1729,7 +1670,6 @@ HTML_TEMPLATE = """
     function renderRemoteSites(remoteSites) {
       const rows = [];
       remoteSiteStatusByName = {};
-      const liveEntries = [];
       const sortedRemoteSites = [...(remoteSites || [])].sort((a, b) => {
         const rank = (s) => {
           if (s === 'running_custom') return 0;
@@ -1751,12 +1691,10 @@ HTML_TEMPLATE = """
           statusHtml = statusBadge(`Running on remote custom ${site.running_port}`, 'ok');
           hint = site.open_url || '-';
           openEnabled = Boolean(site.open_url);
-          liveEntries.push({site: site.name, source: 'SSH custom', port: site.running_port, remote: true});
         } else if (status === 'running_common') {
           statusHtml = statusBadge('Served via remote bench', 'warn');
           hint = site.open_url || '-';
           openEnabled = Boolean(site.open_url);
-          liveEntries.push({site: site.name, source: 'SSH common', port: site.running_port || 8000, remote: true});
         } else if (status === 'running_common_unknown') {
           statusHtml = statusBadge('Bench running on 8000 (default unknown)', 'warn');
           hint = site.open_url || '-';
@@ -1780,8 +1718,6 @@ HTML_TEMPLATE = """
       }
       siteRowsCache = rows;
       renderSiteRows();
-      liveSiteEntries = liveEntries;
-      renderLiveSiteLogTable(liveSiteEntries);
     }
 
     function openRemoteSite(site) {
@@ -1837,14 +1773,9 @@ HTML_TEMPLATE = """
       }
 
       const rows = [];
-      const liveEntries = [];
       const customBySite = {};
       for (const server of (data.running_site_servers || [])) {
         customBySite[server.site] = server;
-        liveEntries.push({site: server.site, source: 'Local custom', port: server.port, remote: false});
-      }
-      if (data.common_port_running && data.common_port_site) {
-        liveEntries.push({site: data.common_port_site, source: 'Local common', port: data.common_port, remote: false});
       }
       const sortedSites = [...(data.sites || [])].sort((a, b) => {
         const aCustom = Boolean(customBySite[a.name]);
@@ -1901,15 +1832,6 @@ HTML_TEMPLATE = """
       }
       siteRowsCache = rows;
       renderSiteRows();
-      liveSiteEntries = liveEntries;
-      renderLiveSiteLogTable(liveSiteEntries);
-    }
-
-    async function refreshLogs() {
-      const data = await api('/api/logs');
-      const box = document.getElementById('logBox');
-      box.textContent = (data.logs || []).join('\\n');
-      box.scrollTop = box.scrollHeight;
     }
 
     async function refreshAll() {
@@ -1918,19 +1840,7 @@ HTML_TEMPLATE = """
       } catch (e) {
         console.error('Status refresh failed:', e);
       }
-
-      try {
-        await refreshLogs();
-      } catch (e) {
-        console.error('Logs refresh failed:', e);
-        const box = document.getElementById('logBox');
-        if (box) {
-          box.textContent = 'Could not load logs: ' + e.message;
-        }
-      }
-      if (selectedLiveLogSite) {
-        await refreshSelectedLiveSiteLog(true);
-      }
+      await refreshTerminal();
     }
 
     async function startBench() {
@@ -2111,12 +2021,14 @@ HTML_TEMPLATE = """
     }
 
     restoreTheme();
+    setupTerminalAutoStick();
     toggleSshBrowse(false);
     restoreSshState().finally(() => {
       loadLocalBenchPaths();
       refreshAll();
     });
     setInterval(refreshAll, 5000);
+    setInterval(refreshTerminal, 2000);
   </script>
   {% endif %}
 </body>
@@ -2704,19 +2616,27 @@ class BenchManager:
 
         # Prefer explicitly provided sudo password; fallback to ssh password.
         sudo_pass = sudo_password or ssh_password
+        remote_inner = (
+            "pkill -f 'bench serve' >/dev/null 2>&1 || true; "
+            "pkill -f 'frappe.utils.bench_helper' >/dev/null 2>&1 || true; "
+            "pkill redis-server >/dev/null 2>&1 || true"
+        )
         remote_cmd = (
-            "bash -lc \"printf '%s\\n' "
-            + shlex.quote(sudo_pass)
-            + " | sudo -S pkill -f 'frappe'; "
-              "printf '%s\\n' "
-            + shlex.quote(sudo_pass)
-            + " | sudo -S pkill redis-server\""
+            "bash -lc "
+            + shlex.quote(
+                "printf '%s\\n' "
+                + shlex.quote(sudo_pass)
+                + " | sudo -S -p '' bash -lc "
+                + shlex.quote(remote_inner)
+            )
         )
         proc = self._run_ssh_capture(target, ssh_password, remote_cmd, timeout=35)
         stderr = (proc.stderr or "").strip().lower()
         if "incorrect password" in stderr or "try again" in stderr or "authentication failure" in stderr:
             raise RuntimeError("Incorrect remote sudo password")
-        if proc.returncode not in (0, 1):
+        if "a terminal is required" in stderr or "must have a tty" in stderr:
+            raise RuntimeError("Remote sudo requires a TTY for this user. Allow non-TTY sudo or run with a permitted sudo policy.")
+        if proc.returncode != 0:
             err = (proc.stderr or proc.stdout or "Remote force stop command failed").strip()
             raise RuntimeError(err)
 
@@ -2830,6 +2750,109 @@ class BenchManager:
             return "\n".join(content[-lines:])
         except Exception:
             return ""
+
+    def _tail_lines(self, path: Path, lines: int = 40) -> List[str]:
+        try:
+            return path.read_text(errors="ignore").splitlines()[-lines:]
+        except Exception:
+            return []
+
+    def terminal_snapshot(self, lines: int = 240) -> Dict[str, object]:
+        self.cleanup_dead_processes()
+        common_running = self.common_port_running()
+        running_custom = [x for x in self.site_servers.values() if self._is_process_running(x.pid)]
+        running = bool(common_running or running_custom)
+
+        log_files: List[Path] = []
+        if self.bench_log.exists():
+            log_files.append(self.bench_log)
+        for server in running_custom:
+            log_path = Path(server.log_file)
+            if log_path.exists():
+                log_files.append(log_path)
+
+        if not log_files and not self.logs:
+            output = "$ waiting for logs...\nNo bench or site output yet."
+        else:
+            sections: List[str] = []
+            recent_panel = self.logs[-40:]
+            if recent_panel:
+                sections.append(
+                    "==> panel.log <==\n"
+                    + "\n".join(recent_panel)
+                )
+
+            per_file_lines = max(25, lines // max(1, len(log_files)))
+            for path in log_files:
+                tail = self._tail_lines(path, lines=per_file_lines)
+                if not tail:
+                    continue
+                rel = path
+                try:
+                    rel = path.relative_to(self.bench_path)
+                except Exception:
+                    rel = path
+                sections.append(f"==> {rel} <==\n" + "\n".join(tail))
+
+            output = "\n\n".join(sections).strip()
+            if not output:
+                output = "$ waiting for logs..."
+
+        return {
+            "running": running,
+            "path": str(self.bench_path),
+            "output": output,
+        }
+
+    def terminal_snapshot_remote(
+        self,
+        ssh_target: str,
+        bench_path: str,
+        ssh_password: str = "",
+        lines: int = 200,
+    ) -> Dict[str, object]:
+        remote_status = self.list_remote_sites(ssh_target, bench_path, ssh_password)
+        remote_sites = remote_status.get("sites", [])
+        running = bool(
+            remote_status.get("common_running")
+            or any((site.get("status") or "") != "stopped" for site in remote_sites)
+        )
+        bench = str(remote_status.get("bench_path", "")).strip() or bench_path.strip()
+
+        tail_lines = max(20, min(120, int(lines)))
+        remote_cmd = (
+            f"BENCH={shlex.quote(bench)}; export BENCH; "
+            "if [ ! -d \"$BENCH\" ]; then echo '__ERROR__: Bench path not found'; exit 2; fi; "
+            "if [ ! -d \"$BENCH/.bench_panel_runtime\" ]; then "
+            "  echo '$ waiting for logs...'; "
+            "  echo 'No .bench_panel_runtime directory yet.'; "
+            "  exit 0; "
+            "fi; "
+            "FILES=$(find \"$BENCH/.bench_panel_runtime\" -maxdepth 1 -type f -name '*.log' | sort | tail -n 6); "
+            "if [ -z \"$FILES\" ]; then "
+            "  echo '$ waiting for logs...'; "
+            "  echo 'No log files in .bench_panel_runtime yet.'; "
+            "  exit 0; "
+            "fi; "
+            "while IFS= read -r f; do "
+            "  [ -z \"$f\" ] && continue; "
+            "  rel=\"${f#$BENCH/}\"; "
+            "  printf '==> %s <==\\n' \"$rel\"; "
+            f"  tail -n {tail_lines} \"$f\" 2>/dev/null || true; "
+            "  printf '\\n'; "
+            "done <<< \"$FILES\""
+        )
+        proc = self._run_ssh_capture(ssh_target.strip(), ssh_password, remote_cmd, timeout=20)
+        if proc.returncode != 0:
+            err = (proc.stderr or proc.stdout or "Failed to fetch remote terminal output").strip()
+            raise RuntimeError(err)
+        output = (proc.stdout or "").strip() or "$ waiting for remote logs..."
+
+        return {
+            "running": running,
+            "path": bench,
+            "output": output,
+        }
 
     def _save_state(self) -> None:
         data = [asdict(server) for server in self.site_servers.values() if self._is_process_running(server.pid)]
@@ -3151,13 +3174,20 @@ class BenchManager:
         if not sudo_password:
             raise ValueError("Sudo password is required")
 
-        # Execute the exact stop intent requested by user:
-        # sudo pkill -f "frappe" && sudo pkill redis-server
-        cmd = 'sudo -S pkill -f "frappe" && sudo -S pkill redis-server'
+        # Avoid broad "pkill -f frappe" because it can match this panel path
+        # (frappe-bench/.../bench_panel.py) and terminate the UI itself.
+        inner_cmd = (
+            'pkill -f "bench serve" >/dev/null 2>&1 || true; '
+            'pkill -f "frappe.utils.bench_helper" >/dev/null 2>&1 || true; '
+            'pkill redis-server >/dev/null 2>&1 || true'
+        )
+        cmd = (
+            "sudo -S -p '' bash -lc " + shlex.quote(inner_cmd)
+        )
         proc = subprocess.run(
             ["bash", "-lc", cmd],
             cwd=str(self.bench_path),
-            input=f"{sudo_password}\n{sudo_password}\n",
+            input=f"{sudo_password}\n",
             capture_output=True,
             text=True,
             check=False,
@@ -3166,9 +3196,10 @@ class BenchManager:
         stderr = (proc.stderr or "").strip().lower()
         if "incorrect password" in stderr or "try again" in stderr or "authentication failure" in stderr:
             raise RuntimeError("Incorrect sudo password")
+        if "a terminal is required" in stderr or "must have a tty" in stderr:
+            raise RuntimeError("Sudo requires a TTY for this user. Allow non-TTY sudo or run with a permitted sudo policy.")
 
-        # pkill returns non-zero if no process matched; treat that as non-fatal.
-        if proc.returncode not in (0, 1):
+        if proc.returncode != 0:
             raise RuntimeError((proc.stderr or proc.stdout or "Force stop command failed").strip())
 
         with self.lock:
@@ -3178,76 +3209,6 @@ class BenchManager:
             self._save_state()
 
         return {"message": "Force stop command executed successfully."}
-
-    def get_logs(self) -> List[str]:
-        lines: List[str] = []
-
-        if self.bench_log.exists():
-            try:
-                bench_lines = self.bench_log.read_text(errors="ignore").splitlines()[-80:]
-                lines.extend([f"[bench.log] {line}" for line in bench_lines])
-            except Exception as exc:
-                lines.append(f"Could not read bench log: {exc}")
-
-        lines.extend(self.logs[-200:])
-        return lines[-250:]
-
-    def get_site_live_log(self, site: str, lines: int = 120) -> Dict[str, object]:
-        site_name = (site or "").strip()
-        if not site_name:
-            raise ValueError("site is required")
-        max_lines = max(20, min(int(lines or 120), 400))
-        self.cleanup_dead_processes()
-        server = self.site_servers.get(site_name)
-        if not server:
-            raise ValueError(f"Site {site_name} is not running from this panel")
-
-        log_path = Path(server.log_file)
-        out = []
-        if log_path.exists():
-            out = log_path.read_text(errors="ignore").splitlines()[-max_lines:]
-        return {
-            "site": site_name,
-            "port": server.port,
-            "logs": out,
-        }
-
-    def get_remote_site_live_log(
-        self,
-        ssh_target: str,
-        bench_path: str,
-        site: str,
-        port: int,
-        ssh_password: str = "",
-        lines: int = 120,
-    ) -> Dict[str, object]:
-        target = (ssh_target or "").strip()
-        bench = (bench_path or "").strip()
-        site_name = (site or "").strip()
-        if not target or not bench or not site_name:
-            raise ValueError("ssh_target, bench_path and site are required")
-        if port < 1 or port > 65535:
-            raise ValueError("port must be between 1 and 65535")
-        max_lines = max(20, min(int(lines or 120), 400))
-        safe_site = re.sub(r"[^A-Za-z0-9_.-]", "_", site_name)
-
-        remote_script = (
-            f"BENCH={shlex.quote(bench)}; SITE_SAFE={shlex.quote(safe_site)}; PORT={port}; LINES={max_lines}; "
-            "LOG=\"$BENCH/.bench_panel_runtime/${SITE_SAFE}_${PORT}.log\"; "
-            "if [ ! -f \"$LOG\" ]; then echo '__ERROR__: log file not found'; exit 2; fi; "
-            "tail -n \"$LINES\" \"$LOG\""
-        )
-        proc = self._run_ssh_capture(target, ssh_password, remote_script, timeout=20)
-        if proc.returncode != 0:
-            err = (proc.stderr or proc.stdout or "Remote live log failed").strip()
-            if "__ERROR__:" in err:
-                err = err.replace("__ERROR__:", "").strip()
-            raise RuntimeError(err)
-        return {
-            "site": site_name,
-            "port": port,
-            "logs": (proc.stdout or "").splitlines()[-max_lines:],
-        }
 
     def cleanup_dead_processes(self) -> None:
         removed = []
@@ -3333,6 +3294,19 @@ def api_status():
     return jsonify(manager.status())
 
 
+@app.route("/api/terminal")
+def api_terminal():
+    if not login_required():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    assert manager is not None
+    try:
+        return jsonify(manager.terminal_snapshot())
+    except Exception as exc:
+        manager.log(f"Terminal snapshot failed: {exc}")
+        return jsonify({"error": str(exc)}), 500
+
+
 @app.route("/api/bench/paths")
 def api_bench_paths():
     if not login_required():
@@ -3392,6 +3366,23 @@ def api_ssh_sites():
         return jsonify(manager.list_remote_sites(ssh_target, bench_path, ssh_password))
     except Exception as exc:
         manager.log(f"Remote site list failed: {exc}")
+        return jsonify({"error": str(exc)}), 400
+
+
+@app.route("/api/ssh/terminal", methods=["POST"])
+def api_ssh_terminal():
+    if not login_required():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    assert manager is not None
+    payload = request.get_json(force=True) or {}
+    ssh_target = str(payload.get("ssh_target", "")).strip()
+    bench_path = str(payload.get("bench_path", "")).strip()
+    ssh_password = str(payload.get("ssh_password", ""))
+    try:
+        return jsonify(manager.terminal_snapshot_remote(ssh_target, bench_path, ssh_password))
+    except Exception as exc:
+        manager.log(f"Remote terminal snapshot failed: {exc}")
         return jsonify({"error": str(exc)}), 400
 
 
@@ -3470,34 +3461,6 @@ def api_ssh_site_stop():
         return jsonify({"error": str(exc)}), 400
 
 
-@app.route("/api/ssh/site/live-log", methods=["POST"])
-def api_ssh_site_live_log():
-    if not login_required():
-        return jsonify({"error": "Unauthorized"}), 401
-
-    assert manager is not None
-    payload = request.get_json(force=True) or {}
-    ssh_target = str(payload.get("ssh_target", "")).strip()
-    bench_path = str(payload.get("bench_path", "")).strip()
-    site = str(payload.get("site", "")).strip()
-    ssh_password = str(payload.get("ssh_password", ""))
-    raw_port = payload.get("port")
-    raw_lines = payload.get("lines", 120)
-    try:
-        port = int(raw_port)
-    except Exception:
-        return jsonify({"error": "port is required and must be a number"}), 400
-    try:
-        lines = int(raw_lines)
-    except Exception:
-        lines = 120
-    try:
-        return jsonify(manager.get_remote_site_live_log(ssh_target, bench_path, site, port, ssh_password, lines))
-    except Exception as exc:
-        manager.log(f"Remote site live log failed: {exc}")
-        return jsonify({"error": str(exc)}), 400
-
-
 @app.route("/api/ssh/force-stop-all", methods=["POST"])
 def api_ssh_force_stop_all():
     if not login_required():
@@ -3513,34 +3476,6 @@ def api_ssh_force_stop_all():
         return jsonify(manager.force_stop_all_remote(ssh_target, bench_path, ssh_password, sudo_password))
     except Exception as exc:
         manager.log(f"Remote force stop failed: {exc}")
-        return jsonify({"error": str(exc)}), 400
-
-
-@app.route("/api/logs")
-def api_logs():
-    if not login_required():
-        return jsonify({"error": "Unauthorized"}), 401
-
-    assert manager is not None
-    return jsonify({"logs": manager.get_logs()})
-
-
-@app.route("/api/site/live-log")
-def api_site_live_log():
-    if not login_required():
-        return jsonify({"error": "Unauthorized"}), 401
-
-    assert manager is not None
-    site = str(request.args.get("site", "")).strip()
-    raw_lines = request.args.get("lines", "120")
-    try:
-        lines = int(raw_lines)
-    except Exception:
-        lines = 120
-    try:
-        return jsonify(manager.get_site_live_log(site, lines))
-    except Exception as exc:
-        manager.log(f"Site live log failed: {exc}")
         return jsonify({"error": str(exc)}), 400
 
 
